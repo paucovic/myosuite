@@ -44,7 +44,7 @@ def edit_fn_arm_reaching(spec: mujoco.MjSpec) -> None:
 		root_body = spec.body(root)
 		child_body = root_body.first_body()
 		if child_body is not None:
-			spec.detach_body(child_body)
+			spec.delete(child_body)
 
 	# Add back simplified digits (each phalanx is a body with a mesh)
 	for root in root_list:
