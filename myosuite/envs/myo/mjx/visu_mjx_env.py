@@ -14,7 +14,7 @@ from brax.training.acme.running_statistics import normalize
 local_path = os.path.dirname(os.path.realpath(__file__))
 
 def main(env_name, load_policy, use_reset):
-    env, _, network_factory = load_env_and_network_factory(env_name, 'jax')
+    env, _, network_factory = load_env_and_network_factory(env_name, 'warp')
 
     # If we don't load a trained policy, we will transmit actions from the user inputs in the simulate window.
     ppo_network = None
@@ -23,7 +23,7 @@ def main(env_name, load_policy, use_reset):
         ppo_network = network_factory(
             env.observation_size,
             env.action_size)
-        params = model.load_params(local_path+"/"+"playground_params.pickle")
+        params = model.load_params(local_path+"/"+"VISU_policy.pickle")
 
         def deterministic_policy(input_data):
             logits = ppo_network.policy_network.apply(*params[:2], input_data)

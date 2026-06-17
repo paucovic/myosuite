@@ -14,3 +14,6 @@
 [submodule "myosuite/simhive/YCB_sim"]
 	path = myosuite/simhive/YCB_sim
 	url = https://github.com/vikashplus/YCB_sim.git
+[submodule "myosuite/simhive/myo_model"]
+	path = myosuite/simhive/myo_model
+	url = https://github.com/myolab/myo_model.git

@@ -5,14 +5,16 @@ from etils import epath
 from jax import numpy as jp
 import myosuite.envs.myo.mjx.myo_registry as registry
 from mujoco_playground._src import mjx_env
+from flax import linen
 
 from myosuite.envs.myo.mjx.playground_pose_v0 import MjxPoseEnvV0
 from myosuite.envs.myo.mjx.playground_reach_v0 import MjxReachEnvV0
+from myosuite.envs.myo.mjx.playground_baoding_v0 import MjxBaodingEnvV0
 
 base_config = config_dict.create(
     ctrl_dt=0.02,
     sim_dt=0.002,
-    num_envs=4_096,
+    num_envs=64,
     max_episode_steps=100,
     model_path=epath.Path("/tmp/dummy.xml"),
     impl="jax",
@@ -41,26 +43,28 @@ reach_env_config = config_dict.ConfigDict({**base_config, **config_dict.create(
 )})
 
 ppo_config = config_dict.create(
-    num_timesteps=50_000_000,
-    learning_rate=3e-4,
+    num_timesteps=20_000_000,
+    learning_rate=1e-5,         #3e-4 is a good default, but we may want to tune this for some envs.
     discounting=0.97,
     gae_lambda=0.95,
-    entropy_cost=0.001,
-    clipping_epsilon=0.3,
+    entropy_cost=0.001,        #0.001 is a good default, but we may want to tune this for some envs.
+    clipping_epsilon=0.3,       #0.3 is a good default, but we may want to tune this for some envs.
     max_grad_norm=1.0,
     action_repeat=1,
     num_minibatches=32,
-    num_updates_per_batch=8,
+    num_updates_per_batch=8,    #8 is a good default, but we may want to tune this for some envs.
     batch_size=256,
     unroll_length=10,
     reward_scaling=1.0,
     normalize_observations=True,
-    num_evals=16,
-    num_eval_envs=128,
+    num_evals=32,
+    num_eval_envs=8,
     num_resets_per_eval=1,
+    deterministic_eval=True,
     network_factory=config_dict.create(
         policy_hidden_layer_sizes=(64, 64, 64),
         value_hidden_layer_sizes=(64, 64, 64),
+        activation=linen.relu,
         policy_obs_key="state",
         value_obs_key="state",
     ),
@@ -89,6 +93,28 @@ model_filename = "myohand_pose.xml"
 hand_reach_env_config["model_path"] = (
     epath.Path(epath.resource_path("myosuite")) / model_path / model_filename
 )
+
+# Baoding balls ==============================
+baoding_env_config = copy.deepcopy(base_config)
+model_path = "envs/myo/mjx/"
+model_filename = "myohand_baoding_mjx.xml"
+baoding_env_config["model_path"] = (epath.Path(epath.resource_path("myosuite")) / model_path / model_filename)
+
+#Settings for the environment.
+baoding_env_config["max_episode_steps"] = 400
+baoding_env_config["drop_th"] = 1.25
+baoding_env_config["hold_dist_th"] = 0.2
+baoding_env_config["norm_actions"] = True
+
+#Auxilary values for the goals.
+baoding_env_config["proximity_th"] = 0.015
+baoding_env_config["goal_time_period"] = 5.0
+baoding_env_config["goal_xradius"] = 0.025
+baoding_env_config["goal_yradius"] = 0.028
+baoding_env_config["center_pos"] = jp.array([-0.0125, -0.07])
+baoding_env_config["ball_1_starting_angle"] = jp.pi / 4.0
+baoding_env_config["ball_2_starting_angle"] = jp.pi / 4.0 - jp.pi
+
 
 
 def wrap_class(wrapper_cls, wrapped_env_cls, wrapper_config=None):
@@ -198,8 +224,19 @@ def make(env_name: str, config_overrides=None) -> mjx_env.MjxEnv:
             env_name, MjxReachEnvV0, config_callable(hand_reach_env_config)
         )
         env = registry.load(env_name, config_overrides=config_overrides)
-
+    
         return env
+
+    if "MjxBaoding" in env_name_base:
+        registry.register_environment_with_variants(
+            env_name_base,
+            MjxBaodingEnvV0,
+            config_callable(baoding_env_config),
+        )
+        env = registry.load(env_name, config_overrides=config_overrides)
+        return env
+
+        
 
 
 env_names = [
@@ -209,4 +246,5 @@ env_names = [
     "MjxFingerPoseRandom-v0",
     "MjxHandReachRandom-v0",
     "MjxHandReachFixed-v0",
+    "MjxBaodingDebug-v0",
 ]
