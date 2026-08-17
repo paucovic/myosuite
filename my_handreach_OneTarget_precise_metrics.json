@@ -1,0 +1,246 @@
+{
+  "config": {
+    "env_id": "myoHandReachRandom-v0",
+    "seed": 0,
+    "device": "cuda:0",
+    "training": {
+      "iterations": 2000,
+      "num_envs": 256,
+      "num_steps_per_env": 32,
+      "learning_rate": 0.0003,
+      "min_adaptive_lr": 1e-06,
+      "max_adaptive_lr": 0.0003,
+      "schedule": "fixed",
+      "num_learning_epochs": 5,
+      "num_mini_batches": 4,
+      "clip_param": 0.2,
+      "desired_kl": 0.01,
+      "max_grad_norm": 1.0,
+      "entropy_coef": 0.0
+    },
+    "evaluation": {
+      "num_evals": 50,
+      "eval_num_envs": 64,
+      "eval_steps": 200,
+      "fixed_seed": 20000
+    },
+    "target": {
+      "randomize_target": false,
+      "finger_names": [
+        "THtip",
+        "IFtip",
+        "MFtip",
+        "RFtip",
+        "LFtip"
+      ],
+      "nominal_fingertip_targets": [
+        [
+          -0.175,
+          -0.535,
+          1.49
+        ],
+        [
+          -0.16,
+          -0.575,
+          1.465
+        ],
+        [
+          -0.145,
+          -0.55,
+          1.46
+        ],
+        [
+          -0.135,
+          -0.525,
+          1.455
+        ],
+        [
+          -0.13,
+          -0.5,
+          1.445
+        ]
+      ],
+      "shared_target_offset_low": [
+        -0.015,
+        -0.012,
+        -0.01
+      ],
+      "shared_target_offset_high": [
+        0.015,
+        0.012,
+        0.01
+      ],
+      "per_finger_target_jitter_low": [
+        -0.02,
+        -0.02,
+        -0.015
+      ],
+      "per_finger_target_jitter_high": [
+        0.02,
+        0.02,
+        0.015
+      ]
+    },
+    "reward": {
+      "distance_penalty_scale": 20.0,
+      "proximity_reward_scale": 2.0,
+      "proximity_reward_sharpness": 25.0,
+      "velocity_penalty_scale": 0.002,
+      "action_penalty_scale": 0.001,
+      "solved_distance_th": 0.05,
+      "very_solved_distance_th": 0.025,
+      "solved_bonus_value": 2.0,
+      "very_solved_bonus_value": 25.0
+    },
+    "observation_layout": {
+      "qpos": [
+        0,
+        23
+      ],
+      "qvel": [
+        23,
+        46
+      ],
+      "tip_pos": [
+        46,
+        61
+      ],
+      "target_pos": [
+        61,
+        76
+      ],
+      "target_err": [
+        76,
+        91
+      ],
+      "act": [
+        91,
+        130
+      ]
+    }
+  },
+  "metrics": [
+    {
+      "eval_index": 0.0,
+      "iteration": 0.0,
+      "num_steps": 0.0,
+      "env_steps": 0.0,
+      "elapsed_sec": 0.0,
+      "eval/mean_reward": -6250.708984375,
+      "eval/reward_per_step": -31.253543853759766,
+      "eval/distance": 0.14243659377098083,
+      "eval/distance_sum": 0.7121829986572266,
+      "eval/distance_mean": 0.14243659377098083,
+      "eval/distance_max": 0.1690758317708969,
+      "eval/distance_sum_last": 0.44792112708091736,
+      "eval/distance_mean_last": 0.08958422392606735,
+      "eval/distance_max_last": 0.12531451880931854,
+      "eval/solved_fraction": 0.014000000432133675,
+      "eval/very_solved_fraction": 0.0020000000949949026,
+      "eval/all_solved_fraction": 0.0,
+      "eval/all_very_solved_fraction": 0.0,
+      "train/num_updates": 0.0,
+      "train/learning_rate": 0.0003
+    },
+    {
+      "eval_index": 1.0,
+      "iteration": 40.0,
+      "num_steps": 327680.0,
+      "env_steps": 327680.0,
+      "elapsed_sec": 57.4209680557251,
+      "eval/mean_reward": -4069.626220703125,
+      "eval/reward_per_step": -20.34813117980957,
+      "eval/distance": 0.09776269644498825,
+      "eval/distance_sum": 0.48881345987319946,
+      "eval/distance_mean": 0.09776269644498825,
+      "eval/distance_max": 0.12190338224172592,
+      "eval/distance_sum_last": 0.44792112708091736,
+      "eval/distance_mean_last": 0.08958422392606735,
+      "eval/distance_max_last": 0.12531451880931854,
+      "eval/solved_fraction": 0.012000000104308128,
+      "eval/very_solved_fraction": 0.004000000189989805,
+      "eval/all_solved_fraction": 0.0,
+      "eval/all_very_solved_fraction": 0.0,
+      "train/num_updates": 40.0,
+      "train/entropy": 55.14083048343658,
+      "train/learning_rate": 0.0003,
+      "train/surrogate": -0.01546891880512703,
+      "train/value": 74040.8319189453
+    },
+    {
+      "eval_index": 2.0,
+      "iteration": 80.0,
+      "num_steps": 655360.0,
+      "env_steps": 655360.0,
+      "elapsed_sec": 110.40924668312073,
+      "eval/mean_reward": 3362.482421875,
+      "eval/reward_per_step": 16.81241226196289,
+      "eval/distance": 0.05246683955192566,
+      "eval/distance_sum": 0.2623341977596283,
+      "eval/distance_mean": 0.05246683955192566,
+      "eval/distance_max": 0.07756587117910385,
+      "eval/distance_sum_last": 0.44792112708091736,
+      "eval/distance_mean_last": 0.08958422392606735,
+      "eval/distance_max_last": 0.12531451880931854,
+      "eval/solved_fraction": 0.36125001311302185,
+      "eval/very_solved_fraction": 0.19215625524520874,
+      "eval/all_solved_fraction": 0.0,
+      "eval/all_very_solved_fraction": 0.0,
+      "train/num_updates": 40.0,
+      "train/entropy": 54.444753766059875,
+      "train/learning_rate": 0.0003,
+      "train/surrogate": -0.017216428969695698,
+      "train/value": 60526.09617675781
+    },
+    {
+      "eval_index": 3.0,
+      "iteration": 120.0,
+      "num_steps": 983040.0,
+      "env_steps": 983040.0,
+      "elapsed_sec": 159.74025869369507,
+      "eval/mean_reward": 498.241455078125,
+      "eval/reward_per_step": 2.4912073612213135,
+      "eval/distance": 0.05686843767762184,
+      "eval/distance_sum": 0.2843421995639801,
+      "eval/distance_mean": 0.05686843767762184,
+      "eval/distance_max": 0.0893724113702774,
+      "eval/distance_sum_last": 0.44792112708091736,
+      "eval/distance_mean_last": 0.08958422392606735,
+      "eval/distance_max_last": 0.12531451880931854,
+      "eval/solved_fraction": 0.4573906362056732,
+      "eval/very_solved_fraction": 0.0780312567949295,
+      "eval/all_solved_fraction": 0.0,
+      "eval/all_very_solved_fraction": 0.0,
+      "train/num_updates": 40.0,
+      "train/entropy": 53.978422417640694,
+      "train/learning_rate": 0.0003,
+      "train/surrogate": -0.017406803534249775,
+      "train/value": 122101.58324218751
+    },
+    {
+      "eval_index": 4.0,
+      "iteration": 160.0,
+      "num_steps": 1310720.0,
+      "env_steps": 1310720.0,
+      "elapsed_sec": 207.07674193382263,
+      "eval/mean_reward": -3079.76416015625,
+      "eval/reward_per_step": -15.398820877075195,
+      "eval/distance": 0.09847278147935867,
+      "eval/distance_sum": 0.49236395955085754,
+      "eval/distance_mean": 0.09847278147935867,
+      "eval/distance_max": 0.13189592957496643,
+      "eval/distance_sum_last": 0.44792112708091736,
+      "eval/distance_mean_last": 0.08958422392606735,
+      "eval/distance_max_last": 0.12531451880931854,
+      "eval/solved_fraction": 0.10617188364267349,
+      "eval/very_solved_fraction": 0.04685937613248825,
+      "eval/all_solved_fraction": 0.0,
+      "eval/all_very_solved_fraction": 0.0,
+      "train/num_updates": 40.0,
+      "train/entropy": 53.820390448570244,
+      "train/learning_rate": 0.0003,
+      "train/surrogate": -0.017449197507521608,
+      "train/value": 155474.18482421877
+    }
+  ]
+}

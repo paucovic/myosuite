@@ -1,0 +1,54 @@
+{
+  "config": {
+    "env_id": "myoElbowPose1D6MFixed-v0",
+    "seed": 0,
+    "device": "cuda:0",
+    "training": {
+      "iterations": 500,
+      "num_envs": 64,
+      "num_steps_per_env": 64,
+      "learning_rate": 0.0003,
+      "num_learning_epochs": 2,
+      "num_mini_batches": 1,
+      "clip_param": 0.2,
+      "desired_kl": 0.01,
+      "max_grad_norm": 1.0,
+      "entropy_coef": null
+    },
+    "evaluation": {
+      "num_evals": 20,
+      "eval_num_envs": 16,
+      "eval_steps": 200
+    },
+    "target": {
+      "randomize_target": true,
+      "target_low": 0.35,
+      "target_high": 1.25
+    },
+    "reward": {
+      "pose_scale": 2.0,
+      "velocity_penalty_scale": 0.05,
+      "action_penalty_scale": 0.01,
+      "close_pose_th": 0.1,
+      "very_close_pose_th": 0.05,
+      "close_bonus_value": 2.0,
+      "very_close_bonus_value": 4.0
+    }
+  },
+  "metrics": [
+    {
+      "eval_index": 0.0,
+      "iteration": 0.0,
+      "num_steps": 0.0,
+      "env_steps": 0.0,
+      "elapsed_sec": 0.0,
+      "eval/mean_reward": 107.6163330078125,
+      "eval/reward_per_step": 0.5380816459655762,
+      "eval/pose_error_abs": 0.22711896896362305,
+      "eval/pose_error_abs_last": 0.8096222877502441,
+      "eval/close_solved_fraction": 0.3318749964237213,
+      "eval/very_close_solved_fraction": 0.16499999165534973,
+      "train/num_updates": 0.0
+    }
+  ]
+}
