@@ -4,8 +4,7 @@ Visualize a trained two-fingertip mjlab HandReach policy.
 
 Run from the repository root:
 
-    python scripts/mjlab/hand_reach/visualize_handreach_2F.py \
-        --policy-path my_handreach_2F_policy.pt
+    python scripts/mjlab/hand_reach/visualize_handreach_2F.py --policy-path my_handreach_2F_policy.pt
 
 Optional fixed target, using THtip xyz followed by IFtip xyz:
 

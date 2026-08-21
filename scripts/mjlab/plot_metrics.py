@@ -65,6 +65,7 @@ RL_KEYWORDS = (
     "ep_len",
     "ep_rew",
     "mean_reward",
+    "solved",
 )
 
 SKIP_KEYS = {
@@ -89,6 +90,7 @@ DISPLAY_NAME_OVERRIDES = {
     "eval/episode_reward": "Evaluation episode return",
     "eval/mean_reward": "Evaluation mean return",
     "eval/reward_per_step": "Evaluation reward per step",
+    "eval/myosuite_solved_fraction": "MyoSuite solved fraction",
 
     "train/value": "Critic value loss",
     "train/value_loss": "Critic value loss",
@@ -356,6 +358,9 @@ def plot_metric(
     plt.xlabel(clean_axis_label(x_axis_key))
     plt.ylabel(display_name)
     plt.title(display_name)
+
+    if "fraction" in metric_key.lower():
+        plt.ylim(0.0, 1.0)
 
     plt.grid(True)
     plt.tight_layout()
