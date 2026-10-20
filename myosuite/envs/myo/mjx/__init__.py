@@ -23,9 +23,9 @@ base_config = config_dict.create(
 
 pose_env_config = config_dict.ConfigDict({**base_config, **config_dict.create(
     reward_config=config_dict.create(
-        angle_reward_weight=1.0,
+        angle_reward_weight=3.0,
         ctrl_cost_weight=1.0,
-        pose_thd=0.35,
+        pose_thd=0.05,
         far_th=4 * jp.pi / 2,
         bonus_weight=4.0,
     ),
@@ -43,7 +43,7 @@ reach_env_config = config_dict.ConfigDict({**base_config, **config_dict.create(
 )})
 
 ppo_config = config_dict.create(
-    num_timesteps=20_000_000,
+    num_timesteps=40_000_000,
     learning_rate=1e-5,         #3e-4 is a good default, but we may want to tune this for some envs.
     discounting=0.97,
     gae_lambda=0.95,
@@ -58,9 +58,14 @@ ppo_config = config_dict.create(
     reward_scaling=1.0,
     normalize_observations=True,
     num_evals=32,
-    num_eval_envs=8,
+    num_eval_envs=16,
     num_resets_per_eval=1,
     deterministic_eval=True,
+
+    #Learing curve logging
+    log_training_metrics=True,
+    training_metrics_steps=81920,
+
     network_factory=config_dict.create(
         policy_hidden_layer_sizes=(64, 64, 64),
         value_hidden_layer_sizes=(64, 64, 64),
@@ -143,7 +148,7 @@ def make(env_name: str, config_overrides=None) -> mjx_env.MjxEnv:
                 )
         elif env_name_base == "MjxElbowPoseRandom-v0":
             elbow_pose_env_config["target_jnt_range"] = config_dict.create(
-                    r_elbow_flex=jp.array(((0), (2.27)))
+                    r_elbow_flex=jp.array(((0.35), (1.75)))
                 )
         registry.register_environment_with_variants(env_name_base,
                                       MjxPoseEnvV0,
@@ -187,7 +192,7 @@ def make(env_name: str, config_overrides=None) -> mjx_env.MjxEnv:
                 LFtip=jp.array(((-0.148, -0.528, 1.434), (-0.148, -0.528, 1.434))),
             )
         elif env_name_base == "MjxHandReachRandom-v0":
-            hand_reach_env_config["far_th"] = 0.034
+            hand_reach_env_config["far_th"] = 0.05
             hand_reach_env_config["target_reach_range"] = config_dict.create(
                 THtip=jp.array(
                     (

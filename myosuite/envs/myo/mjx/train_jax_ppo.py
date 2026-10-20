@@ -1,10 +1,24 @@
 """Train a PPO agent using brax."""
-
+import json
 import functools
 import time
 import os
 import jax
 import csv
+
+#Globals
+
+#Learning and Evaluation curve logging
+metrics_jsonl_path = None
+printed_metric_keys = False
+
+times = [time.monotonic()]
+total_steps = [0]
+log_csv_path = None
+
+eval_rewards_by_step = {}
+params_by_step = {}
+best_eval_reward = -float("inf")
 
 print(f"Current backend: {jax.default_backend()}. "
       f"If you expect gpu but see cpu, you may need to reinstall jax with a suitable version of cuda.")
@@ -26,6 +40,14 @@ def main(env_name, impl, log_to_wandb, save_policy, policy_name):
 
     global log_csv_path
     log_csv_path = policy_name.replace(".pickle", "_learning_curve.csv")
+
+    global metrics_jsonl_path
+    metrics_jsonl_path = policy_name.replace(".pickle", "_all_metrics.jsonl")
+
+    with open(metrics_jsonl_path, "w") as f:
+        pass
+
+    print(f"Saving all metrics to: {metrics_jsonl_path}")
 
     with open(log_csv_path, "w", newline="") as f:
         writer = csv.writer(f)
@@ -92,13 +114,7 @@ def load_env_and_network_factory(env_name, impl, config_overrides=None):
 
     return env, ppo_params, network_factory
 
-times = [time.monotonic()]
-total_steps = [0]
-log_csv_path = None
 
-eval_rewards_by_step = {}
-params_by_step = {}
-best_eval_reward = -float("inf")
 
 
 def _policy_path(policy_name, suffix):
@@ -114,29 +130,73 @@ def save_policy_checkpoint(num_steps, make_policy, params, policy_name):
     maybe_save_best_policy(num_steps, policy_name)
 
 
+
 def progress(num_steps, metrics, log_to_wandb, policy_name):
-    """Log eval reward and save BEST policy if this eval improved."""
+    global printed_metric_keys
+
+    def _to_float_or_none(x):
+        try:
+            return float(x)
+        except Exception:
+            return None
+
+    if not printed_metric_keys:
+        print("\nAvailable metric keys:")
+        for key in sorted(metrics.keys()):
+            print("  ", key)
+        print()
+        printed_metric_keys = True
+
     times.append(time.monotonic())
     total_steps.append(num_steps)
 
-    eval_reward = float(metrics["eval/episode_reward"])
-    eval_rewards_by_step[num_steps] = eval_reward
+    eval_reward = None
+    if "eval/episode_reward" in metrics:
+        eval_reward = float(metrics["eval/episode_reward"])
+        eval_rewards_by_step[num_steps] = eval_reward
+        maybe_save_best_policy(num_steps, policy_name)
 
-    maybe_save_best_policy(num_steps, policy_name)
+    print_text = f"Step {num_steps} at {times[-1]}"
 
-    print(f"Step {num_steps} at {times[-1]}: reward={eval_reward:.3f}")
+    if eval_reward is not None:
+        print_text += f": eval_reward={eval_reward:.3f}"
 
-    if log_csv_path is not None:
-        with open(log_csv_path, "a", newline="") as f:
-            writer = csv.writer(f)
-            writer.writerow([
-                num_steps,
-                times[-1] - times[0],
-                eval_reward,
-            ])
+        if log_csv_path is not None:
+            with open(log_csv_path, "a", newline="") as f:
+                writer = csv.writer(f)
+                writer.writerow([
+                    num_steps,
+                    times[-1] - times[0],
+                    eval_reward,
+                ])
+
+    # Print training reward if available.
+    for key in [
+        "training/episode_reward",
+        "training/episode_return",
+        "training/reward",
+    ]:
+        if key in metrics:
+            print_text += f", {key}={float(metrics[key]):.3f}"
+
+    print(print_text)
 
     if log_to_wandb:
         wandb.log(metrics, step=num_steps)
+
+    if metrics_jsonl_path is not None:
+        row = {
+            "num_steps": int(num_steps),
+            "wall_time": float(times[-1] - times[0]),
+        }
+
+        for key, value in metrics.items():
+            scalar_value = _to_float_or_none(value)
+            if scalar_value is not None:
+                row[key] = scalar_value
+
+        with open(metrics_jsonl_path, "a") as f:
+            f.write(json.dumps(row) + "\n")
 
 
 def maybe_save_best_policy(num_steps, policy_name):
@@ -171,7 +231,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--impl",
         type=str,
-        default="jax",
+        default="warp",
         help='Implementation to use: "jax" (MJX) or "warp" (MJWarp)',
     )
     parser.add_argument(
